@@ -109,7 +109,7 @@ app.put('/api/persons/:id', (request, response, next) => {
     .catch(error => next(error))
 })
 
-// ---------------using error handler and unknown endpoint------
+// ---------------using unknown endpoint------
 app.use(unknownEndpoint);
 
 // ---------------port details---------------------------------
