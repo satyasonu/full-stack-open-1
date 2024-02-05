@@ -83,3 +83,33 @@ test('title or url is missing response as 400', async () => {
     .send(newBlog)
     .expect(400)
 })
+
+describe('deletion of a blog', () => {
+  test('succeeds with status 204 if id is valid', async () => {
+    const blogAtStart = await blogsIndb()
+
+    const blogToDelete = blogAtStart[0]
+
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .expect(204)
+
+    const blogsAtEnd = await blogsIndb()
+
+    expect(blogsAtEnd).toHaveLength(blogAtStart.length - 1)
+
+    const titles = blogsAtEnd.map(blog =>  blog.title)
+
+    expect(titles).not.toContain(blogToDelete.title)
+  })
+
+  test('Failed with status 400', async () => {
+    const blogAtStart = await blogsIndb()
+
+    const blogToDelete = blogAtStart[0]
+
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}36678`)
+      .expect(400)
+  })
+})
