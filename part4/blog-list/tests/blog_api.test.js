@@ -6,20 +6,7 @@ const api = supertest(app)
 
 const Blog = require('../models/blog')
 
-const initialBlogs = [
-  {
-    title:'React Blogs',
-    author:'Satyabrata Sahoo',
-    url:'http://blog.react.com',
-    likes:10
-  },
-  {
-    title:'Tailwind blog',
-    author:'Balabanta Sahoo',
-    url:'http://tailwind.com',
-    likes: 25
-  }
-]
+const { initialBlogs, blogsIndb } = require('./test_helper')
 
 beforeEach( async () => {
   await Blog.deleteMany()
@@ -54,11 +41,11 @@ test('new blog added to the list', async () => {
     .send(newBlog)
     .expect(201)
 
-  const blogs = await api.get('/api/blogs')
+  const blogs = await blogsIndb()
 
-  expect(blogs.body).toHaveLength(initialBlogs.length + 1)
+  expect(blogs).toHaveLength(initialBlogs.length + 1)
 
-  const titles = blogs.body.map(blog => blog.title)
+  const titles = blogs.map(blog => blog.title)
 
   expect(titles).toContain(newBlog.title)
 
@@ -75,12 +62,24 @@ test('missing likes property value is 0', async () => {
     .send(newBlog)
     .expect(201)
   
-  const blogs = await api.get('/api/blogs')
+  const blogs = await blogsIndb()
 
-  expect(blogs.body).toHaveLength(initialBlogs.length + 1)
+  expect(blogs).toHaveLength(initialBlogs.length + 1)
 
-  const findblog = blogs.body.find(blog => blog.title === newBlog.title)
-  console.log(findblog)
+  const findblog = blogs.find(blog => blog.title === newBlog.title)
 
   expect(findblog.likes).toEqual(0)
+})
+
+test('title or url is missing response as 400', async () => {
+  const newBlog = {
+    title:'Typescript blog',
+    author:'Chandan Sahoo',
+    likes: 69
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
 })
