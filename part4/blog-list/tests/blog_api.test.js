@@ -42,3 +42,26 @@ test('Unique identifier named as id', async () => {
     expect(blog.id).toBeDefined()
   })
 })
+
+test('new blog added to the list', async () => {
+  const newBlog = {
+      title:'Typescript blog',
+      author:'Chandan Sahoo',
+      url:'http://typescript.com',
+      likes: 55
+  }
+
+  await api
+  .post('/api/blogs')
+  .send(newBlog)
+  .expect(201)
+
+  const blogs = await api.get('/api/blogs')
+  
+  expect(blogs.body).toHaveLength(initialBlogs.length + 1)
+
+  const titles = blogs.body.map(blog => blog.title)
+
+  expect(titles).toContain(newBlog.title)
+    
+})
