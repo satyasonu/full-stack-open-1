@@ -113,3 +113,40 @@ describe('deletion of a blog', () => {
       .expect(400)
   })
 })
+
+describe('updation of individual blog', () => {
+  test('succeeds with 201 if id is valid', async () => {
+    const newLikes = {
+      likes: 56
+    }
+
+    const blogsAtStart = await blogsIndb()
+
+    const blogsToUpdate = blogsAtStart[0]
+
+    await api
+      .put(`/api/blogs/${blogsToUpdate.id}`)
+      .send(newLikes)
+      .expect(201)
+
+    const blogsAtEnd = await blogsIndb()
+
+    const individualObject = blogsAtEnd.find(blog => blogsToUpdate.id === blog.id)
+
+    expect(individualObject.likes).toEqual(newLikes.likes)
+  })
+  test('Fails with 400 if id is not valid', async () => {
+    const newLikes = {
+      likes: 56
+    }
+
+    const blogsAtStart = await blogsIndb()
+
+    const blogsToUpdate = blogsAtStart[0]
+
+    await api
+      .put(`/api/blogs/${blogsToUpdate.id}65464`)
+      .send(newLikes)
+      .expect(400)
+  })
+})
