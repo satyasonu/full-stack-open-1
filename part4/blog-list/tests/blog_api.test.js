@@ -103,7 +103,7 @@ describe('deletion of a blog', () => {
     expect(titles).not.toContain(blogToDelete.title)
   })
 
-  test('Failed with status 400', async () => {
+  test('Failed with status 400 if id is not valid', async () => {
     const blogAtStart = await blogsIndb()
 
     const blogToDelete = blogAtStart[0]
