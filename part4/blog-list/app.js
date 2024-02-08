@@ -6,6 +6,8 @@ require('express-async-errors')
 const { info, error } = require('./utils/logger')
 const { mongoUrl } = require('./utils/config')
 const blogsRouter = require('./controllers/blogs')
+const userRouter = require('./controllers/users')
+const loginRouter = require('./controllers/login')
 const { requestLogger, errorHandler, unknownEndpoint } = require('./utils/middleware')
 
 mongoose.connect(mongoUrl)
@@ -21,6 +23,8 @@ app.use(express.json())
 app.use(requestLogger)
 
 app.use('/api/blogs', blogsRouter)
+app.use('/api/users', userRouter)
+app.use('/api/login', loginRouter)
 
 app.use(errorHandler)
 app.use(unknownEndpoint)
