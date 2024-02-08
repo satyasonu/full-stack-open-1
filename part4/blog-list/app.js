@@ -8,7 +8,7 @@ const { mongoUrl } = require('./utils/config')
 const blogsRouter = require('./controllers/blogs')
 const userRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')
-const { requestLogger, errorHandler, unknownEndpoint } = require('./utils/middleware')
+const { requestLogger, errorHandler, unknownEndpoint, tokenExtractor } = require('./utils/middleware')
 
 mongoose.connect(mongoUrl)
   .then(() => {
@@ -21,6 +21,7 @@ mongoose.connect(mongoUrl)
 app.use(cors())
 app.use(express.json())
 app.use(requestLogger)
+app.use(tokenExtractor)
 
 app.use('/api/blogs', blogsRouter)
 app.use('/api/users', userRouter)
