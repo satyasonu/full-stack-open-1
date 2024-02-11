@@ -76,6 +76,15 @@ function App() {
     }
   }
 
+  const handleLikeButton = async (e, blog) => {
+    e.preventDefault()
+    const newBlog = {likes: blog.likes + 1}
+    const response = await blogService.update(blog.id, newBlog)
+    const updatedBlogs = initialBlogs.map(bg => (bg.id === blog.id ? response : bg));
+    setInitialblogs(updatedBlogs);
+    console.log(response)
+  }
+
   return (
     <>
       <Notification data ={{color:color, content:notification}}/>
@@ -88,7 +97,7 @@ function App() {
             <Toggleable ref = {blogFormRef}>
               <BlogForm data = {{handleBlogSubmit}}/>
             </Toggleable>
-            <Blogs blogs={initialBlogs}/>
+            <Blogs handleLikeButton={handleLikeButton} blogs={initialBlogs}/>
           </div>
       }
     </>
