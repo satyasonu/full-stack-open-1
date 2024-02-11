@@ -10,10 +10,7 @@ import Toggleable from './components/Toggleable'
 
 function App() {
   const [initialBlogs, setInitialblogs] = useState([])
-  const [blogTitle, setBlogTitle] = useState("")
-  const [authorInput, setAuthorInput] = useState("")
-  const [urlInput, setUrlInput] = useState("")
-  const [likesInput, setLikesInput] = useState("")
+  
   const [usernameInput, setUsernameInput] = useState("")
   const [passwordInput, setPasswordInput] = useState("")
   const [user, setUser] = useState(null)
@@ -37,23 +34,15 @@ function App() {
     }
   }, [])
 
-  const handleBlogSubmit = async (e) => {
+  const handleBlogSubmit = async (e, newBlog) => {
+
     e.preventDefault()
     try{
-      const newBlog = {
-        "title": blogTitle,
-        "author": authorInput,
-        "url": urlInput,
-        "likes": likesInput
-      }
+      
         const response = await blogService.create(newBlog)
         setInitialblogs((prev) => [...prev, response])
         setNotification(`a new blog ${newBlog.title} by ${user.name} added`)
         setColor("green")
-        setBlogTitle("")
-        setAuthorInput("")
-        setUrlInput("")
-        setLikesInput("")
         setTimeout(() => {
           setNotification(null)
           setColor(null)
@@ -69,7 +58,8 @@ function App() {
       }, 5000)
     }
   }
-  const handleLogin = async (e) => {
+  const handleLogin = async (e, name) => {
+    console.log(name)
     e.preventDefault()
     try{
       const userFetched = await loginService.login({usernameInput, passwordInput})
@@ -98,7 +88,7 @@ function App() {
             <h1>Blogs</h1>
             <div>{user.name} logged in <button onClick={() => {window.localStorage.removeItem('loggedUserData');window.location.reload()}}>logout</button></div>
             <Toggleable ref = {blogFormRef}>
-              <BlogForm data = {{handleBlogSubmit, blogTitle, setBlogTitle, authorInput, setAuthorInput, urlInput, setUrlInput, likesInput, setLikesInput}}/>
+              <BlogForm data = {{handleBlogSubmit}}/>
             </Toggleable>
             <Blog blogs={initialBlogs}/>
           </div>
