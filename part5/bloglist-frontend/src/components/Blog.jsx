@@ -1,12 +1,27 @@
-import React from 'react'
-const Blog = ({blogs}) => {
+import React, { useState } from 'react'
+
+const Blog = ({blog}) => {
+  const [showHide, setShowHide] = useState(false)
+  // console.log(blog.users.length > 0 ? blog.users[0].name : '')
+  const blogStyle = {
+    paddingTop: 10,
+    paddingLeft: 2,
+    border: 'solid',
+    borderWidth: 1,
+    marginBottom: 5
+  }
+  const handleShowHide = () => {
+    setShowHide(!showHide)
+  }
   return (
-    <div>
-        {blogs.map(blog => {
-          return (
-            <React.Fragment key={blog.id}>{blog.title}<br/></React.Fragment>
-          )
-        })}
+    <div style={blogStyle}>
+      {blog.title}<button onClick={handleShowHide}>{showHide ? "hide" : "view"}</button><br/>
+      <div style={{display: showHide ? '' : 'none'}}>
+        {blog.url}<br/>
+        {blog.author}<br/>
+        {blog.likes}<button>like</button><br/>
+        {blog.users.length > 0 ? blog.users[0].name : ''}
+      </div>
     </div>
   )
 }

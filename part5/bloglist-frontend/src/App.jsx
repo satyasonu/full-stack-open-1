@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import blogService from './Services/BlogService'
-import Blog from "./components/Blog"
+import Blogs from "./components/Blogs"
 import BlogForm from "./components/BlogForm"
 import LoginForm from "./components/LoginForm"
 import loginService from './Services/LoginService'
@@ -10,7 +10,6 @@ import Toggleable from './components/Toggleable'
 
 function App() {
   const [initialBlogs, setInitialblogs] = useState([])
-  
   const [usernameInput, setUsernameInput] = useState("")
   const [passwordInput, setPasswordInput] = useState("")
   const [user, setUser] = useState(null)
@@ -35,11 +34,10 @@ function App() {
   }, [])
 
   const handleBlogSubmit = async (e, newBlog) => {
-
     e.preventDefault()
     try{
-      
         const response = await blogService.create(newBlog)
+        console.log(response)
         setInitialblogs((prev) => [...prev, response])
         setNotification(`a new blog ${newBlog.title} by ${user.name} added`)
         setColor("green")
@@ -90,7 +88,7 @@ function App() {
             <Toggleable ref = {blogFormRef}>
               <BlogForm data = {{handleBlogSubmit}}/>
             </Toggleable>
-            <Blog blogs={initialBlogs}/>
+            <Blogs blogs={initialBlogs}/>
           </div>
       }
     </>
