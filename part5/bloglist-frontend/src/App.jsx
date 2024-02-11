@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import blogService from './Services/BlogService'
 import Blog from "./components/Blog"
 import BlogForm from "./components/BlogForm"
@@ -6,6 +6,7 @@ import LoginForm from "./components/LoginForm"
 import loginService from './Services/LoginService'
 import Notification from "./components/Notification"
 import './App.css'
+import Toggleable from './components/Toggleable'
 
 function App() {
   const [initialBlogs, setInitialblogs] = useState([])
@@ -18,7 +19,7 @@ function App() {
   const [user, setUser] = useState(null)
   const [notification, setNotification] = useState(null)
   const [color, setColor] = useState(null)
-  
+  const blogFormRef = useRef()
   useEffect(() => {
     const fetchBlogs = async () => {
       const data = await blogService.getAll()
@@ -57,6 +58,7 @@ function App() {
           setNotification(null)
           setColor(null)
         }, 5000)
+        blogFormRef.current.handleCancelButton()
         
     } catch (exception) {
       setNotification(exception.response.data.error)
@@ -95,9 +97,10 @@ function App() {
         : <div>
             <h1>Blogs</h1>
             <div>{user.name} logged in <button onClick={() => {window.localStorage.removeItem('loggedUserData');window.location.reload()}}>logout</button></div>
-            <BlogForm data = {{handleBlogSubmit, blogTitle, setBlogTitle, authorInput, setAuthorInput, urlInput, setUrlInput, likesInput, setLikesInput}}/>
+            <Toggleable ref = {blogFormRef}>
+              <BlogForm data = {{handleBlogSubmit, blogTitle, setBlogTitle, authorInput, setAuthorInput, urlInput, setUrlInput, likesInput, setLikesInput}}/>
+            </Toggleable>
             <Blog blogs={initialBlogs}/>
-            
           </div>
       }
     </>
