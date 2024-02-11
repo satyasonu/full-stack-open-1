@@ -2,9 +2,11 @@ const app = require('../app')
 const supertest = require('supertest')
 const User = require('../models/user')
 const api = supertest(app)
+const {initialUser} = require('./test_helper')
 
 beforeEach(async () => {
   await User.deleteMany()
+  await User.insertMany(initialUser)
 })
 
 describe('add a new user', () => {
@@ -22,7 +24,7 @@ describe('add a new user', () => {
       .expect('content-type', /application\/json/)
     const users = await User.find({})
 
-    expect(users).toHaveLength(1)
+    expect(users).toHaveLength(2)
     const names = users.map(user => user.name)
     expect(names).toContain(newUser.name)
   })

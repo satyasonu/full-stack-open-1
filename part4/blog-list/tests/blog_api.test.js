@@ -5,12 +5,17 @@ const app = require('../app')
 const api = supertest(app)
 
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
-const { initialBlogs, blogsIndb } = require('./test_helper')
+const { initialBlogs, blogsIndb, initialUser } = require('./test_helper')
 
 beforeEach( async () => {
   await Blog.deleteMany()
   await Blog.insertMany(initialBlogs)
+  await User.deleteMany()
+  await api
+    .post('/api/users')
+    .send(initialUser)
 })
 
 test('blogs length is two', async () => {
@@ -27,62 +32,87 @@ test('Unique identifier named as id', async () => {
     expect(blog.id).toBeDefined()
   })
 })
+describe('adding a new blog', () => {
 
-test('new blog added to the list', async () => {
-  const newBlog = {
-    title:'Typescript blog',
-    author:'Chandan Sahoo',
-    url:'http://typescript.com',
-    likes: 55
-  }
+  test('new blog added to the list', async () => {
+    const res = await api.post('/api/login').send({ username: initialUser.username, password: initialUser.password })
+    const token = res.body.token
 
-  await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .expect(201)
+    const newBlog = {
+      title:'Typescript blog',
+      author:'Chandan Sahoo',
+      url:'http://typescript.com',
+      likes: 55
+    }
 
-  const blogs = await blogsIndb()
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(201)
 
-  expect(blogs).toHaveLength(initialBlogs.length + 1)
+    const blogs = await blogsIndb()
 
-  const titles = blogs.map(blog => blog.title)
+    expect(blogs).toHaveLength(initialBlogs.length + 1)
 
-  expect(titles).toContain(newBlog.title)
+    const titles = blogs.map(blog => blog.title)
 
+    expect(titles).toContain(newBlog.title)
+
+  })
+
+  test('missing likes property value is 0', async () => {
+    const res = await api.post('/api/login').send({ username: initialUser.username, password: initialUser.password })
+    const token = res.body.token
+    const newBlog = {
+      title:'Typescript blog',
+      author:'Chandan Sahoo',
+      url:'http://typescript.com'
+    }
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(201)
+
+    const blogs = await blogsIndb()
+
+    expect(blogs).toHaveLength(initialBlogs.length + 1)
+
+    const findblog = blogs.find(blog => blog.title === newBlog.title)
+
+    expect(findblog.likes).toEqual(0)
+  })
+
+  test('title or url is missing response as 400', async () => {
+    const res = await api.post('/api/login').send({ username: initialUser.username, password: initialUser.password })
+    const token = res.body.token
+    const newBlog = {
+      title:'Typescript blog',
+      author:'Chandan Sahoo',
+      likes: 69
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(400)
+  })
+  test('Unauthorized 401 if token is not provided', async () => {
+    const newBlog = {
+      title:'Typescript blog',
+      author:'Chandan Sahoo',
+      likes: 69
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(401)
+  })
 })
 
-test('missing likes property value is 0', async () => {
-  const newBlog = {
-    title:'Typescript blog',
-    author:'Chandan Sahoo',
-    url:'http://typescript.com'
-  }
-  await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .expect(201)
-  
-  const blogs = await blogsIndb()
-
-  expect(blogs).toHaveLength(initialBlogs.length + 1)
-
-  const findblog = blogs.find(blog => blog.title === newBlog.title)
-
-  expect(findblog.likes).toEqual(0)
-})
-
-test('title or url is missing response as 400', async () => {
-  const newBlog = {
-    title:'Typescript blog',
-    author:'Chandan Sahoo',
-    likes: 69
-  }
-
-  await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .expect(400)
-})
 
 describe('deletion of a blog', () => {
   test('succeeds with status 204 if id is valid', async () => {

@@ -1,4 +1,7 @@
 const { info } = require('./logger')
+const jwt = require('jsonwebtoken')
+const { SECRET } = require('./config')
+const User = require('../models/user')
 
 const requestLogger = (request, response, next) => {
   info('Method: ', request.method)
@@ -11,16 +14,21 @@ const requestLogger = (request, response, next) => {
 
 const errorHandler = (error, request, response, next) => {
   if (error.name === 'CastError') {
-    return response.status(400).send({ error: 'malformatted id' })
+    return response.status(400).send({ error: 'malformatted id',name: error.name })
   } else if (error.name === 'ValidationError') {
-    return response.status(400).json({ error: error.message })
+    return response.status(400).json({ error: error.message, name: error.name})
   } else if(error.name === 'TypeError') {
-    return response.status(400).json({ error: error.message })
+    return response.status(400).json({ error: error.message, name: error.name })
   } else if( error.name === "MongoServerError"){
-    return response.status(400).json({ error: error.message })
+    return response.status(400).json({ error: error.message, name: error.name })
   } else if( error.name === 'Error'){
-    return response.status(400).json({ error: error.message })
+    return response.status(400).json({ error: error.message, name: error.name })
+  } else if( error.name === 'TokenExpiredError'){
+    return response.status(400).json({ error: error.message, name: error.name })
+  } else if( error.name === 'JsonWebTokenError'){
+    return response.status(401).json({ error: "Token must be provided"})
   }
+
 
   next(error)
 }
@@ -37,4 +45,15 @@ const tokenExtractor = (request, response, next) => {
   next()
 }
 
-module.exports = { requestLogger, errorHandler, unknownEndpoint, tokenExtractor }
+const userExtractor = async (request, response, next) => {
+  const decodedToken = jwt.verify(request.token, SECRET)
+  if(!decodedToken._id){
+    response.status(401).json({error: "Invalid token"})
+  }
+
+  request.user = await User.findById(decodedToken._id)
+
+  next()
+}
+
+module.exports = { requestLogger, errorHandler, unknownEndpoint, tokenExtractor, userExtractor }
