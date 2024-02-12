@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from 'react'
 import blogService from './Services/BlogService'
-import Blogs from "./components/Blogs"
-import BlogForm from "./components/BlogForm"
-import LoginForm from "./components/LoginForm"
+import Blogs from './components/Blogs'
+import BlogForm from './components/BlogForm'
+import LoginForm from './components/LoginForm'
 import loginService from './Services/LoginService'
-import Notification from "./components/Notification"
+import Notification from './components/Notification'
 import './App.css'
 import Toggleable from './components/Toggleable'
 
@@ -37,20 +37,20 @@ function App() {
   const handleBlogSubmit = async (e, newBlog) => {
     e.preventDefault()
     try{
-        const response = await blogService.create(newBlog)
-        console.log(response)
-        setInitialblogs((prev) => [...prev, response])
-        setNotification(`a new blog ${newBlog.title} by ${user.name} added`)
-        setColor("green")
-        setTimeout(() => {
-          setNotification(null)
-          setColor(null)
-        }, 5000)
-        blogFormRef.current.handleCancelButton()
-        
+      const response = await blogService.create(newBlog)
+      setInitialblogs((prev) => [...prev, response])
+      setNotification(`a new blog ${newBlog.title} by ${user.name} added`)
+      setColor('green')
+      setTimeout(() => {
+        setNotification(null)
+        setColor(null)
+      }, 5000)
+      blogFormRef.current.handleCancelButton()
+
     } catch (exception) {
+      console.log(exception)
       setNotification(exception.response.data.error)
-      setColor("red")
+      setColor('red')
       setTimeout(() => {
         setNotification(null)
         setColor(null)
@@ -58,18 +58,17 @@ function App() {
     }
   }
   const handleLogin = async (e, name) => {
-    console.log(name)
     e.preventDefault()
     try{
-      const userFetched = await loginService.login({usernameInput, passwordInput})
+      const userFetched = await loginService.login({ usernameInput, passwordInput })
       blogService.setToken(userFetched.token)
       window.localStorage.setItem('loggedUserData', JSON.stringify(userFetched))
-      setUsernameInput("")
-      setPasswordInput("")
+      setUsernameInput('')
+      setPasswordInput('')
       setUser(userFetched)
     } catch (exception){
       setNotification(exception.response.data.error)
-      setColor("red")
+      setColor('red')
       setTimeout(() => {
         setNotification(null)
         setColor(null)
@@ -79,26 +78,45 @@ function App() {
 
   const handleLikeButton = async (e, blog) => {
     e.preventDefault()
-    const newBlog = {likes: blog.likes + 1}
+    const newBlog = { likes: blog.likes + 1 }
     const response = await blogService.update(blog.id, newBlog)
-    const updatedBlogs = initialBlogs.map(bg => (bg.id === blog.id ? response : bg));
-    setInitialblogs(updatedBlogs);
+    const updatedBlogs = initialBlogs.map(bg => (bg.id === blog.id ? response : bg))
+    setInitialblogs(updatedBlogs)
     console.log(response)
+  }
+
+  const handleRemoveButton = async (e, blog) => {
+    try{
+      if(window.confirm(`Remove ${blog.title} by ${blog.users.length === 0 ? '' : blog.users[0].name}`)){
+        await blogService.deleteBlog(blog.id)
+        const remainedBlogs = initialBlogs.filter(bg => bg.id !== blog.id)
+        setInitialblogs(remainedBlogs)
+      }
+    }
+    catch (exception){
+      setNotification(exception.response.data.error)
+      setColor('red')
+      setTimeout(() => {
+        setNotification(null)
+        setColor(null)
+      }, 5000)
+    }
+
   }
 
   return (
     <>
-      <Notification data ={{color:color, content:notification}}/>
+      <Notification data ={{ color:color, content:notification }}/>
       {
         user === null ?
-        <LoginForm data = {{handleLogin, usernameInput, setUsernameInput,passwordInput, setPasswordInput}} />
-        : <div>
+          <LoginForm data = {{ handleLogin, usernameInput, setUsernameInput,passwordInput, setPasswordInput }} />
+          : <div>
             <h1>Blogs</h1>
             <div>{user.name} logged in <button onClick={() => {window.localStorage.removeItem('loggedUserData');window.location.reload()}}>logout</button></div>
-            <Toggleable ref = {blogFormRef}>
-              <BlogForm data = {{handleBlogSubmit}}/>
+            <Toggleable ref = {blogFormRef} buttonLabel ="new blog">
+              <BlogForm handleBlogSubmit = {handleBlogSubmit}/>
             </Toggleable>
-            <Blogs handleLikeButton={handleLikeButton} blogs={initialBlogs}/>
+            <Blogs handleLikeButton={handleLikeButton} handleRemoveButton={handleRemoveButton} blogs={initialBlogs}/>
           </div>
       }
     </>

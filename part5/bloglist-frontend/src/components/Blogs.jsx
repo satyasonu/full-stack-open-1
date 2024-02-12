@@ -1,13 +1,13 @@
 import React from 'react'
 import Blog from './Blog'
-const Blogs = ({blogs, handleLikeButton}) => {
+const Blogs = ({ blogs, handleLikeButton, handleRemoveButton }) => {
   return (
     <div>
-        {blogs.map(blog => {
-          return (
-            <Blog handleLikeButton={handleLikeButton} key={blog.id} blog={blog}/>
-          )
-        })}
+      {blogs.map(blog => {
+        return (
+          <Blog handleLikeButton={handleLikeButton} handleRemoveButton={handleRemoveButton} key={blog.id} blog={blog}/>
+        )
+      })}
     </div>
   )
 }

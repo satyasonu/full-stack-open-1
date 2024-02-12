@@ -1,4 +1,5 @@
-import { forwardRef, useImperativeHandle, useState } from "react"
+import { forwardRef, useImperativeHandle, useState } from 'react'
+import PropTypes from 'prop-types'
 
 const Toggleable = forwardRef((props, refs) => {
   const [showHide, setShowHide] = useState(false)
@@ -11,15 +12,15 @@ const Toggleable = forwardRef((props, refs) => {
   }
 
   useImperativeHandle(refs, () => {
-      return {
-        handleCancelButton
-      }
+    return {
+      handleCancelButton
+    }
   })
   return (
     <>
       <div>
-        <button style={{display: showHide ? 'none' : '' }} onClick={handleCreatebutton}>new blog</button>
-        <div style={{display: showHide ? '' : 'none'}}>
+        <button style={{ display: showHide ? 'none' : '' }} onClick={handleCreatebutton}>{props.buttonLabel}</button>
+        <div style={{ display: showHide ? '' : 'none' }}>
           {props.children}
           <button onClick={handleCancelButton}>cancel</button>
         </div>
@@ -27,4 +28,9 @@ const Toggleable = forwardRef((props, refs) => {
     </>
   )
 })
+Toggleable.propTypes = {
+  buttonLabel: PropTypes.string.isRequired
+}
+
+Toggleable.displayName = 'Toggleable'
 export default Toggleable
