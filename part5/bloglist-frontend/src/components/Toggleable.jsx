@@ -20,7 +20,7 @@ const Toggleable = forwardRef((props, refs) => {
     <>
       <div>
         <button style={{ display: showHide ? 'none' : '' }} onClick={handleCreatebutton}>{props.buttonLabel}</button>
-        <div style={{ display: showHide ? '' : 'none' }}>
+        <div style={{ display: showHide ? '' : 'none' }} className='toggleableContent'>
           {props.children}
           <button onClick={handleCancelButton}>cancel</button>
         </div>

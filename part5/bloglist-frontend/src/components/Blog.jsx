@@ -11,15 +11,16 @@ const Blog = ({ blog, handleLikeButton, handleRemoveButton }) => {
   }
   const handleShowHide = () => {
     setShowHide(!showHide)
+    
   }
   return (
     <div style={blogStyle}>
-      {blog.title}<button onClick={handleShowHide}>{showHide ? 'hide' : 'view'}</button><br/>
+      <span className='title'>{blog.title}</span><button className='showHideBtn' onClick={handleShowHide}>{showHide ? 'hide' : 'view'}</button><br/>
+        <span className='author'>{blog.author}</span><br/>
       <div style={{ display: showHide ? '' : 'none' }}>
-        {blog.url}<br/>
-        {blog.author}<br/>
-        {blog.likes}<button onClick={(e) => handleLikeButton(e, blog)}>like</button><br/>
-        {blog.users.length > 0 ? blog.users[0].name : ''}<br/>
+        <span className='url'>{blog.url}</span><br/>
+        <span className='likes'>{blog.likes}</span><button onClick={(e) => handleLikeButton(e, blog)} className='linkbtn'>like</button><br/>
+        <span className='user'>{blog.users.length > 0 ? blog.users[0].name : ''}</span><br/>
         <button style={{ backgroundColor: '#1E90FF' }} onClick={(e) => handleRemoveButton(e, blog)}>remove</button>
       </div>
     </div>

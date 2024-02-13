@@ -15,13 +15,12 @@ const BlogForm = ({ handleBlogSubmit }) => {
   return (
     <form onSubmit={(e) => handleBlogSubmit(e, newBlog)}>
       Add Blog<br />
-      Title: <input placeholder="Enter title" value={blogTitle} onChange={({ target }) => setBlogTitle(target.value)} required/><br />
-      Author: <input placeholder="Enter author name" value={authorInput} onChange={({ target }) => setAuthorInput(target.value)} required/><br />
-      Url: <input placeholder="Enter url" value={urlInput} onChange={({ target }) => setUrlInput(target.value)} required/><br />
+      Title: <input type='text' placeholder="Enter title" value={blogTitle} onChange={({ target }) => setBlogTitle(target.value)} required/><br />
+      Author: <input type='text' placeholder="Enter author name" value={authorInput} onChange={({ target }) => setAuthorInput(target.value)} required/><br />
+      Url: <input type='text' placeholder="Enter url" value={urlInput} onChange={({ target }) => setUrlInput(target.value)} required/><br />
       Likes: <input placeholder="Enter likes" value={likesInput} onChange={({ target }) => setLikesInput(target.value)} /><br />
-      <button>create</button>
+      <button type="submit">create</button>
     </form>
   )
 }
-
 export default BlogForm

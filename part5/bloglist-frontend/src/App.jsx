@@ -82,7 +82,6 @@ function App() {
     const response = await blogService.update(blog.id, newBlog)
     const updatedBlogs = initialBlogs.map(bg => (bg.id === blog.id ? response : bg))
     setInitialblogs(updatedBlogs)
-    console.log(response)
   }
 
   const handleRemoveButton = async (e, blog) => {
