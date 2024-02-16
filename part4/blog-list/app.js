@@ -3,11 +3,13 @@ const app = express()
 const cors = require('cors')
 const mongoose = require('mongoose')
 require('express-async-errors')
+require('dotenv').config()
 const { info, error } = require('./utils/logger')
 const { mongoUrl } = require('./utils/config')
 const blogsRouter = require('./controllers/blogs')
 const userRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')
+
 const { requestLogger, errorHandler, unknownEndpoint, tokenExtractor } = require('./utils/middleware')
 
 mongoose.connect(mongoUrl)
@@ -26,6 +28,11 @@ app.use(tokenExtractor)
 app.use('/api/blogs', blogsRouter)
 app.use('/api/users', userRouter)
 app.use('/api/login', loginRouter)
+
+if (process.env.NODE_ENV === 'test') {
+  const testingRouter = require('./controllers/testing')
+  app.use('/api/testing', testingRouter)
+}
 
 app.use(errorHandler)
 app.use(unknownEndpoint)
