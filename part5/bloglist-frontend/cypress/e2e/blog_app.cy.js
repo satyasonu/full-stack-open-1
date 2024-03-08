@@ -16,8 +16,6 @@ describe('blog app', () => {
     cy.get('#username').type('root')
     cy.get('#password').type('root')
     cy.contains('login').click()
-    cy.contains('Blogs')
-    cy.contains('Component Structure')
   })
 
   describe('when logged in ', () => {

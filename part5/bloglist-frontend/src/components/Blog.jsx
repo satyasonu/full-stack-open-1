@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 
-const Blog = ({ blog, handleLikeButton, handleRemoveButton }) => {
+const  Blog = ({ blog, handleLikeButton, handleRemoveButton }) => {
+  const logedUser = JSON.parse(window.localStorage.getItem('loggedUserData')).username
+  const showUserName = blog.users.length > 0 ? blog.users[0].name : ''
   const [showHide, setShowHide] = useState(false)
   const blogStyle = {
     paddingTop: 10,
@@ -20,8 +22,8 @@ const Blog = ({ blog, handleLikeButton, handleRemoveButton }) => {
       <div style={{ display: showHide ? '' : 'none' }}>
         <span className='url'>{blog.url}</span><br/>
         <span className='likes'>{blog.likes}</span><button onClick={(e) => handleLikeButton(e, blog)} className='linkbtn'>like</button><br/>
-        <span className='user'>{blog.users.length > 0 ? blog.users[0].name : ''}</span><br/>
-        <button style={{ backgroundColor: '#1E90FF' }} onClick={(e) => handleRemoveButton(e, blog)}>remove</button>
+        <span className='user'>{showUserName}</span><br/>
+        { logedUser === blog.users[0].username && <button style={{ backgroundColor: '#1E90FF' }} onClick={(e) => handleRemoveButton(e, blog)}>remove</button>}
       </div>
     </div>
   )
