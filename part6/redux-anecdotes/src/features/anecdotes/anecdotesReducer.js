@@ -24,18 +24,17 @@ const iState = anecdotesAtStart.map(asObject)
 const anecdotesSlice = createSlice({
   name: 'anecdotes',
   initialState : {
-    ad : iState
+    notes: iState
   },
   reducers : {
     addAd : (state, action) => {
       const newAnecdote = {name:action.payload,vote:0, id: getID()}
-      const newAd = state.ad.concat(newAnecdote)
-      return {ad:newAd}
+      state.notes.push(newAnecdote)
     },
     castVote : (state, action) => {
       const votedfor = action.payload
-      const findIndex =   state.ad.findIndex((anecdote) => anecdote.id === votedfor.id)
-      state.ad[findIndex].vote += 1
+      const findIndex =   state.notes.findIndex((anecdote) => anecdote.id === votedfor.id)
+      state.notes[findIndex].vote += 1
       return state
     }
   }
