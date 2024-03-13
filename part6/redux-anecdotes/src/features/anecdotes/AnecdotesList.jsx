@@ -1,43 +1,43 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import Anecdote from './anecdote'
 import { useSelector, useDispatch } from 'react-redux'
 import { castVote} from './anecdotesReducer'
-import {createSelector} from '@reduxjs/toolkit'
-import { setNotification } from '../Notification/notificationReducer'
+import { setNotification, clearNotification } from '../Notification/notificationReducer'
 import Notification from '../Notification/Notification'
-
-const selectNotes = state => state.anecdotes.notes;
-const selectFilter = state => state.filter.filter.toLowerCase();
-
-const selectFilteredNotes = createSelector(
-  [selectNotes, selectFilter],
-  (notes, filter) => {
-    return filter.length === 0
-      ? notes
-      : notes.filter(note => note.name.toLowerCase().includes(filter));
-  }
-);
+import noteService from '../../services/notes'
+import {useGetAllAnecdotesQuery, useUpdateAnecdoteMutation} from '../../redux/rtkapi'
 
 const AnecdotesList = () => {
   const dispatch = useDispatch()
+  const dataToFilter = useSelector(state => state.filter.filter.toLowerCase())
 
-  const filteredNotes = useSelector(selectFilteredNotes);
-  const notification = useSelector((state) => state.notification)
-  // console.log(notification)
-
-  const sortedList = [...filteredNotes].sort((a,b) => b.vote - a.vote)
-  const handleVoteButton = (anecdote) => {
-    dispatch(castVote(anecdote))
-    dispatch(setNotification({
-      data: `You voted '${anecdote.name}'`,
-      color: 'green'
-    }))
-    setTimeout(() => {
-      dispatch(setNotification({data: '', color: ''}))
-    }, 5000)
+  const {data, error, isLoading} = useGetAllAnecdotesQuery()
+  const [updateAnecdote] = useUpdateAnecdoteMutation()
+  let fdata = [];
+  if(data){
+    fdata = dataToFilter.length !== 0 ? Array.from(data).filter(note => note.content.toLowerCase().includes(dataToFilter)) : Array.from(data)
   }
 
-  
+  const notification = useSelector((state) => state.notification)
+
+  const sortedList = fdata.sort((a,b) => b.votes - a.votes)
+  const handleVoteButton = (anecdote) => {
+    // noteService.update({...anecdote, votes: anecdote.votes+1}).then(data => dispatch(castVote(data)))
+    // const newAnecdote = {
+    //   id: anecdote.id,
+    //   content: anecdote.content,
+    //   votes: anecdote.votes + 1
+    // }
+    updateAnecdote({...anecdote, votes: anecdote.votes+1})
+    dispatch(setNotification({
+      data: `You voted '${anecdote.content}'`,
+      color: 'green',
+      time: 5
+    }))
+    setTimeout(() => {
+      dispatch(clearNotification())
+    }, notification.time)
+  }
 
   return (
     <div>

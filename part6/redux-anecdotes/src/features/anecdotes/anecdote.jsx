@@ -4,8 +4,8 @@ const Anecdote = ({data}) => {
   const {anecdote, handleVoteButton} = data
    return (
     <div>
-      <p>{anecdote.name}</p>
-      <p>has{anecdote.vote}<button onClick={() => handleVoteButton(anecdote)}>vote</button></p>
+      <p>{anecdote.content}</p>
+      <p>has{anecdote.votes}<button onClick={() => handleVoteButton(anecdote)}>vote</button></p>
     </div>
   )
 }

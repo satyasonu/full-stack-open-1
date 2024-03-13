@@ -4,9 +4,6 @@ import { setFilter } from './filterSlice'
 
 const FilterAnecdotes = () => {
   const dispatch = useDispatch()
-  
-
-
   return (
     <div>
         <span>filter</span>
